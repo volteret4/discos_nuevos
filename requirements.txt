@@ -1,0 +1,22 @@
+# Obligatorio
+requests>=2.31.0
+feedparser>=6.0.10
+# python-dotenv (actualmente es obligatorio, próximamente será por cohone y a callar)
+python-dotenv>=1.0.0
+
+# ICS (add_releases_ics.py)
+icalendar>=5.0.7
+
+# CalDAV  (add_releases_caldav.py)
+caldav>=1.3.6
+icalendar>=5.0.7
+
+# Google Calendar  (add_releases_google_calendar.py)
+icalendar>=5.0.7
+google-api-python-client>=2.100.0
+google-auth-httplib2>=0.1.1
+google-auth-oauthlib>=1.1.0
+google-auth>=2.22.0
+
+# Spotify (spotify_to_muspy.py, muspy_to_spotify.py)
+spotipy>=2.22.1
