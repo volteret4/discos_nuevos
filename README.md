@@ -128,15 +128,15 @@ pip install -f requirements.txt
 
 ## Crea archivo `.cal`
 
-Con el script `add_releases/add_releases_ics.py`
+Con el script `add_releases/add_releases_ics.py` [Link]
 
 ## Sincroniza con un servidor caldav
 
-Usando el script `add_releases/add_releases_caldav.py`
+Usando el script `add_releases/add_releases_caldav.py` [[Link]](https://github.com/volteret4/discos_nuevos/blob/main/add_releases/add_releases_caldav.py)
 
 ## Sincroniza con Google calendars
 
-Si quieres usar el calendario principal de google usa tu dirección de gmail como id.
+Si quieres usar el calendario principal de google usa tu dirección de gmail como id `example@gmail.com`.
 
 Si quieres usar otro calendario tendrás que usar el script `add_releases/google/google_cal_id_finder.py`
 
