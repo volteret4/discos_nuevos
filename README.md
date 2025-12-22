@@ -17,6 +17,8 @@ Puedes usar la pagina de muspy para sincronizar una cantidad especifica de tus a
 
 ## Credenciales
 
+Tienes varis opciones para pasar las credenciales, `--flags`, variables de entorno o un archivo `.env`. Por ese orden
+
 ### Usando `--flags`
 
 #### Caldav
@@ -128,7 +130,7 @@ pip install -f requirements.txt
 
 ## Crea archivo `.cal`
 
-Con el script `add_releases/add_releases_ics.py` [Link]
+Con el script `add_releases/add_releases_ics.py` [[Link]](https://github.com/volteret4/discos_nuevos/blob/main/add_releases/add_releases_ics.py)
 
 ## Sincroniza con un servidor caldav
 
@@ -138,6 +140,6 @@ Usando el script `add_releases/add_releases_caldav.py` [[Link]](https://github.c
 
 Si quieres usar el calendario principal de google usa tu dirección de gmail como id `example@gmail.com`.
 
-Si quieres usar otro calendario tendrás que usar el script `add_releases/google/google_cal_id_finder.py`
+Si quieres usar otro calendario tendrás que usar el script `add_releases/google/google_cal_id_finder.py` [[Link]](https://github.com/volteret4/discos_nuevos/blob/main/add_releases/google/google_cal_id_finder.py)
 
-Luego puedes usar `add_releases/google/add_releases_google.py`para añadir discos al calendario de google que elijas.
+Luego puedes usar `add_releases/google/add_releases_google.py`para añadir discos al calendario de google que elijas. [[Link]](https://github.com/volteret4/discos_nuevos/blob/main/add_releases/google/add_releases_google.py)
