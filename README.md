@@ -137,5 +137,7 @@ Usando el script `add_releases/add_releases_caldav.py`
 ## Sincroniza con Google calendars
 
 Si quieres usar el calendario principal de google usa tu dirección de gmail como id.
-Si quieres usar otro tendrás que usar el script `add_releases/google/google_cal_id_finder.py`
+
+Si quieres usar otro calendario tendrás que usar el script `add_releases/google/google_cal_id_finder.py`
+
 Luego puedes usar `add_releases/google/add_releases_google.py`para añadir discos al calendario de google que elijas.
