@@ -15,15 +15,6 @@ Accede a muspy.com, y una vez obtengas tu cuenta, haz click derecho en el icono 
 
 Puedes usar la pagina de muspy para sincronizar una cantidad especifica de tus artistas mas escuchados en lastfm o añadir manualmente
 
-### Spotify
-
-También puedes usar el script... Para agregar tus artistas seguidos en spotify.
-
-### Archivo perdonalizado
-
-Con este otro script podrás añadir artistas de un archivo de texto (artistas.txt por ejemplo). Para ello usa el flag `--file`
-Añade un artista por linea e intenta que sean artistas fácilmente identificables, Lola Flores hay dos, para artistas similares mejor usa la web manualmente, tiene un sistema de desambiguación integrado. Si claro, dos sistemas de desambiguación te voy a crear también, mieste. Te ha hecho la boca un fraile no hijo?.
-
 ## Credenciales
 
 ### Usando `--flags`
@@ -137,10 +128,14 @@ pip install -f requirements.txt
 
 ## Crea archivo `.cal`
 
-Con el script
+Con el script `add_releases/add_releases_ics.py`
 
 ## Sincroniza con un servidor caldav
 
-Usando el script
+Usando el script `add_releases/add_releases_caldav.py`
 
 ## Sincroniza con Google calendars
+
+Si quieres usar el calendario principal de google usa tu dirección de gmail como id.
+Si quieres usar otro tendrás que usar el script `add_releases/google/google_cal_id_finder.py`
+Luego puedes usar `add_releases/google/add_releases_google.py`para añadir discos al calendario de google que elijas.
