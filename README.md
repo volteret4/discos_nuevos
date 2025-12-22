@@ -1,4 +1,4 @@
-# alricolonpley
+# discospatitunaitunai
 
 Con estos scripts puedes añadir los discos nuevos de los artistas que sigas en muspy a tu calendario
 
