@@ -17,7 +17,9 @@ Accede a muspy.com, y una vez obtengas tu cuenta, haz click derecho en el icono 
 
 ## Añade artistas
 
-Puedes usar la pagina de muspy para sincronizar una cantidad especifica de tus artistas mas escuchados en lastfm o añadir manualmente
+Puedes usar la pagina de muspy para sincronizar una cantidad especifica de tus artistas mas escuchados en lastfm o añadir manualmente.
+
+También puedes usar los scripts `file_artists_to_muspy.py` para añadir artistas desde un archivo, `music_path_to_muspy.py` para escanear tu biblioteca digital y `spotify_to_muspy.py` para añadir artistas seguidos desde spotify.
 
 ## Credenciales
 
