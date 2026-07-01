@@ -1,0 +1,606 @@
+
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Discos Nuevos - FLAC</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #0a0e27;
+                color: #b0b8c9;
+                display: flex;
+                height: 100vh;
+                overflow: hidden;
+            }
+            .main-container {
+                display: flex;
+                width: 100%;
+            }
+            .albums-container {
+                width: 80%;
+                height: 100vh;
+                overflow-y: auto;
+                padding: 20px;
+            }
+            .albums-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 20px;
+            }
+            .album {
+                background-color: #16213e;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                padding: 10px;
+                cursor: pointer;
+                transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+                text-align: center;
+                border: 2px solid #1f2d4a;
+                position: relative;
+            }
+            .album:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 6px 12px rgba(53, 191, 136, 0.3);
+                border-color: #35bf88;
+            }
+            .album.selected {
+                border: 3px solid #35bf88;
+                box-shadow: 0 6px 12px rgba(53, 191, 136, 0.5);
+            }
+            .album img {
+                width: 100%;
+                border-radius: 5px;
+                aspect-ratio: 1;
+                object-fit: cover;
+            }
+            .album-artist {
+                margin-top: 10px;
+                font-size: 14px;
+                font-weight: bold;
+                color: #ffffff;
+            }
+            .album-name {
+                font-size: 13px;
+                color: #b0b8c9;
+                margin-top: 5px;
+            }
+            .album-date {
+                font-size: 12px;
+                color: #7a8694;
+                margin-top: 5px;
+            }
+            .delete-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: #e74c3c;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 30px;
+                height: 30px;
+                cursor: pointer;
+                font-size: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: opacity 0.3s ease, transform 0.2s ease;
+                z-index: 10;
+            }
+            .album:hover .delete-btn {
+                opacity: 1;
+            }
+            .delete-btn:hover {
+                transform: scale(1.1);
+                background: #c0392b;
+            }
+            .sidebar {
+                width: 20%;
+                height: 100vh;
+                background-color: #16213e;
+                border-left: 2px solid #1f2d4a;
+                overflow-y: auto;
+                padding: 20px;
+            }
+            .sidebar h2 {
+                font-size: 18px;
+                margin-bottom: 15px;
+                color: #35bf88;
+            }
+            .sidebar-placeholder {
+                color: #7a8694;
+                text-align: center;
+                margin-top: 50px;
+                font-size: 14px;
+            }
+            .flac-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 12px;
+            }
+            .flac-table th {
+                background-color: #1f2d4a;
+                padding: 8px;
+                border: 1px solid #2d3e5f;
+                text-align: left;
+                position: sticky;
+                top: 0;
+                font-size: 11px;
+                color: #35bf88;
+            }
+            .flac-table td {
+                padding: 8px;
+                border: 1px solid #2d3e5f;
+                background-color: #16213e;
+                color: #b0b8c9;
+            }
+            .download-btn {
+                background: #35bf88;
+                color: #0a0e27;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+                font-size: 11px;
+            }
+            .download-btn:hover {
+                transform: scale(1.05);
+                box-shadow: 0 3px 10px rgba(53, 191, 136, 0.5);
+            }
+            .download-btn:disabled {
+                background: #7a8694;
+                cursor: not-allowed;
+            }
+            .album-header {
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 2px solid #1f2d4a;
+            }
+            .album-header h3 {
+                font-size: 16px;
+                color: #ffffff;
+                margin-bottom: 5px;
+            }
+            .album-header p {
+                font-size: 12px;
+                color: #b0b8c9;
+            }
+            h1 {
+                padding: 20px;
+                background-color: #16213e;
+                border-bottom: 2px solid #1f2d4a;
+                margin: 0;
+                color: #35bf88;
+                text-shadow: 0 0 10px rgba(53, 191, 136, 0.3);
+            }
+
+            /* Scrollbar personalizado */
+            ::-webkit-scrollbar {
+                width: 10px;
+            }
+            ::-webkit-scrollbar-track {
+                background: #1f2d4a;
+            }
+            ::-webkit-scrollbar-thumb {
+                background: #35bf88;
+                border-radius: 5px;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+                background: #2da672;
+            }
+
+            /* Loader */
+            .loader {
+                border: 3px solid #1f2d4a;
+                border-top: 3px solid #35bf88;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                animation: spin 1s linear infinite;
+                display: inline-block;
+                margin-left: 5px;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+
+            /* Notificación */
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #35bf88;
+                color: #0a0e27;
+                padding: 15px 25px;
+                border-radius: 10px;
+                box-shadow: 0 5px 20px rgba(53, 191, 136, 0.5);
+                z-index: 1000;
+                opacity: 0;
+                transform: translateY(-20px);
+                transition: opacity 0.3s ease, transform 0.3s ease;
+            }
+            .notification.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            .notification.error {
+                background: #e74c3c;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="main-container">
+            <div class="albums-container">
+                <h1>💿 Discos Nuevos - FLAC</h1>
+                <div class="albums-grid">
+    
+                <div class="album" onclick="showTorrents(1555568, 'Mandy, Indiana', 'URGH', 2026, 2)" id="album-1555568">
+                    <button class="delete-btn" onclick="deleteAlbum(1555568, event)" title="Eliminar álbum">×</button>
+                    <img src="https://ptpimg.me/iy2k6j.jpg" alt="Mandy, Indiana - URGH">
+                    <div class="album-artist">Mandy, Indiana</div>
+                    <div class="album-name">URGH</div>
+                    <div class="album-date">(2026) · 2 FLACs</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[1555568] = [{"torrentId": 3509959, "media": "WEB", "encoding": "24bit Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 11, "size": 452665957, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3509959&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}, {"torrentId": 3506002, "media": "WEB", "encoding": "Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 11, "size": 247760050, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3506002&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(1554626, 'Beverly Glenn-Copeland', 'Laughter In Summer', 2026, 2)" id="album-1554626">
+                    <button class="delete-btn" onclick="deleteAlbum(1554626, event)" title="Eliminar álbum">×</button>
+                    <img src="https://ptpimg.me/f9599j.jpg" alt="Beverly Glenn-Copeland - Laughter In Summer">
+                    <div class="album-artist">Beverly Glenn-Copeland</div>
+                    <div class="album-name">Laughter In Summer</div>
+                    <div class="album-date">(2026) · 2 FLACs</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[1554626] = [{"torrentId": 3503063, "media": "WEB", "encoding": "24bit Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 10, "size": 714059898, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3503063&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}, {"torrentId": 3503064, "media": "WEB", "encoding": "Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 10, "size": 197042738, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3503064&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(1549379, 'Beverly Glenn-Copeland', 'Laughter In Summer', 2025, 1)" id="album-1549379">
+                    <button class="delete-btn" onclick="deleteAlbum(1549379, event)" title="Eliminar álbum">×</button>
+                    <img src="https://ptpimg.me/n01o32.jpg" alt="Beverly Glenn-Copeland - Laughter In Summer">
+                    <div class="album-artist">Beverly Glenn-Copeland</div>
+                    <div class="album-name">Laughter In Summer</div>
+                    <div class="album-date">(2025) · 1 FLAC</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[1549379] = [{"torrentId": 3490158, "media": "WEB", "encoding": "Lossless", "remasterYear": 2025, "remasterTitle": "", "fileCount": 4, "size": 67445678, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3490158&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(1563189, 'Altın Gün', 'Garip', 2026, 2)" id="album-1563189">
+                    <button class="delete-btn" onclick="deleteAlbum(1563189, event)" title="Eliminar álbum">×</button>
+                    <img src="https://ptpimg.me/15453i.jpg" alt="Altın Gün - Garip">
+                    <div class="album-artist">Altın Gün</div>
+                    <div class="album-name">Garip</div>
+                    <div class="album-date">(2026) · 2 FLACs</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[1563189] = [{"torrentId": 3524248, "media": "WEB", "encoding": "24bit Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 11, "size": 573840301, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3524248&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}, {"torrentId": 3524185, "media": "WEB", "encoding": "Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 11, "size": 295529942, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3524185&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(1552924, 'Galliano', 'Unreliable Memories Of Contested Conversations', 2026, 2)" id="album-1552924">
+                    <button class="delete-btn" onclick="deleteAlbum(1552924, event)" title="Eliminar álbum">×</button>
+                    <img src="https://i.imgur.com/3coFaeG.jpeg" alt="Galliano - Unreliable Memories Of Contested Conversations">
+                    <div class="album-artist">Galliano</div>
+                    <div class="album-name">Unreliable Memories Of Contested Conversations</div>
+                    <div class="album-date">(2026) · 2 FLACs</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[1552924] = [{"torrentId": 3499067, "media": "WEB", "encoding": "24bit Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 8, "size": 390751941, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3499067&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}, {"torrentId": 3499069, "media": "WEB", "encoding": "Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 8, "size": 212735587, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3499069&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(1559418, 'Danny L Harle', 'Cerulean', 2026, 2)" id="album-1559418">
+                    <button class="delete-btn" onclick="deleteAlbum(1559418, event)" title="Eliminar álbum">×</button>
+                    <img src="https://ptpimg.me/6v1cpv.jpg" alt="Danny L Harle - Cerulean">
+                    <div class="album-artist">Danny L Harle</div>
+                    <div class="album-name">Cerulean</div>
+                    <div class="album-date">(2026) · 2 FLACs</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[1559418] = [{"torrentId": 3515190, "media": "WEB", "encoding": "24bit Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 14, "size": 529766796, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3515190&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}, {"torrentId": 3515189, "media": "WEB", "encoding": "Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 14, "size": 306987047, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3515189&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(1555609, 'Rafael Anton Irisarri', 'Points of Inaccessibility', 2026, 2)" id="album-1555609">
+                    <button class="delete-btn" onclick="deleteAlbum(1555609, event)" title="Eliminar álbum">×</button>
+                    <img src="https://ptpimg.me/66f03c.jpg" alt="Rafael Anton Irisarri - Points of Inaccessibility">
+                    <div class="album-artist">Rafael Anton Irisarri</div>
+                    <div class="album-name">Points of Inaccessibility</div>
+                    <div class="album-date">(2026) · 2 FLACs</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[1555609] = [{"torrentId": 3505506, "media": "WEB", "encoding": "24bit Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 5, "size": 389498842, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3505506&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}, {"torrentId": 3505507, "media": "WEB", "encoding": "Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 5, "size": 175194296, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3505507&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(608483, 'Antonio Vivaldi', 'Vivaldi: Violin Concertos', 1994, 2)" id="album-608483">
+                    <button class="delete-btn" onclick="deleteAlbum(608483, event)" title="Eliminar álbum">×</button>
+                    <img src="https://ptpimg.me/7kguu9.jpg" alt="Antonio Vivaldi - Vivaldi: Violin Concertos">
+                    <div class="album-artist">Antonio Vivaldi</div>
+                    <div class="album-name">Vivaldi: Violin Concertos</div>
+                    <div class="album-date">(1994) · 2 FLACs</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[608483] = [{"torrentId": 3487042, "media": "CD", "encoding": "Lossless", "remasterYear": 1994, "remasterTitle": "", "fileCount": 25, "size": 397270628, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3487042&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}, {"torrentId": 1362632, "media": "WEB", "encoding": "Lossless", "remasterYear": 1994, "remasterTitle": "", "fileCount": 22, "size": 398014877, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=1362632&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(1243798, 'Antonio Vivaldi', 'Vivaldi: Violin Concertos', 2015, 1)" id="album-1243798">
+                    <button class="delete-btn" onclick="deleteAlbum(1243798, event)" title="Eliminar álbum">×</button>
+                    <img src="https://ptpimg.me/x4z53p.jpg" alt="Antonio Vivaldi - Vivaldi: Violin Concertos">
+                    <div class="album-artist">Antonio Vivaldi</div>
+                    <div class="album-name">Vivaldi: Violin Concertos</div>
+                    <div class="album-date">(2015) · 1 FLAC</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[1243798] = [{"torrentId": 2720294, "media": "WEB", "encoding": "Lossless", "remasterYear": 2015, "remasterTitle": "", "fileCount": 22, "size": 383862558, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=2720294&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(1001194, 'Antonio Vivaldi', 'Vivaldi: Violin Concertos', 1963, 2)" id="album-1001194">
+                    <button class="delete-btn" onclick="deleteAlbum(1001194, event)" title="Eliminar álbum">×</button>
+                    <img src="https://i.imgur.com/Xl0bc2G.jpg" alt="Antonio Vivaldi - Vivaldi: Violin Concertos">
+                    <div class="album-artist">Antonio Vivaldi</div>
+                    <div class="album-name">Vivaldi: Violin Concertos</div>
+                    <div class="album-date">(1963) · 2 FLACs</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[1001194] = [{"torrentId": 2126975, "media": "SACD", "encoding": "24bit Lossless", "remasterYear": 1963, "remasterTitle": "Remastered", "fileCount": 23, "size": 1258551699, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=2126975&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}, {"torrentId": 2402094, "media": "SACD", "encoding": "Lossless", "remasterYear": 1963, "remasterTitle": "Remastered", "fileCount": 23, "size": 364990295, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=2402094&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(843276, 'Antonio Vivaldi', 'Vivaldi: Violin Concertos', 2019, 1)" id="album-843276">
+                    <button class="delete-btn" onclick="deleteAlbum(843276, event)" title="Eliminar álbum">×</button>
+                    <img src="https://i.imgur.com/dO7fGsg.jpg" alt="Antonio Vivaldi - Vivaldi: Violin Concertos">
+                    <div class="album-artist">Antonio Vivaldi</div>
+                    <div class="album-name">Vivaldi: Violin Concertos</div>
+                    <div class="album-date">(2019) · 1 FLAC</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[843276] = [{"torrentId": 1824171, "media": "CD", "encoding": "Lossless", "remasterYear": 2019, "remasterTitle": "Erato", "fileCount": 315, "size": 5495645922, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=1824171&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(703816, 'Antonio Vivaldi', 'Vivaldi: Violin Concertos', 1997, 1)" id="album-703816">
+                    <button class="delete-btn" onclick="deleteAlbum(703816, event)" title="Eliminar álbum">×</button>
+                    <img src="https://i.imgur.com/TvOjd5l.jpg" alt="Antonio Vivaldi - Vivaldi: Violin Concertos">
+                    <div class="album-artist">Antonio Vivaldi</div>
+                    <div class="album-name">Vivaldi: Violin Concertos</div>
+                    <div class="album-date">(1997) · 1 FLAC</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[703816] = [{"torrentId": 1547956, "media": "WEB", "encoding": "Lossless", "remasterYear": 1997, "remasterTitle": "", "fileCount": 15, "size": 306538160, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=1547956&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(584502, 'Antonio Vivaldi', 'Vivaldi: Violin Concertos', 2020, 1)" id="album-584502">
+                    <button class="delete-btn" onclick="deleteAlbum(584502, event)" title="Eliminar álbum">×</button>
+                    <img src="https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/d3/4a/37/d34a37d6-6099-ff15-dfac-5ec4aaf63b49/source/100000x100000-999.jpg" alt="Antonio Vivaldi - Vivaldi: Violin Concertos">
+                    <div class="album-artist">Antonio Vivaldi</div>
+                    <div class="album-name">Vivaldi: Violin Concertos</div>
+                    <div class="album-date">(2020) · 1 FLAC</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[584502] = [{"torrentId": 1312106, "media": "WEB", "encoding": "24bit Lossless", "remasterYear": 2020, "remasterTitle": "", "fileCount": 22, "size": 1428491376, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=1312106&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(362689, 'Antonio Vivaldi', 'Vivaldi: Violin Concertos', 1987, 1)" id="album-362689">
+                    <button class="delete-btn" onclick="deleteAlbum(362689, event)" title="Eliminar álbum">×</button>
+                    <img src="https://i.ibb.co/pyP9YD9/R-3674082-1339861690-1900-jpeg.jpg" alt="Antonio Vivaldi - Vivaldi: Violin Concertos">
+                    <div class="album-artist">Antonio Vivaldi</div>
+                    <div class="album-name">Vivaldi: Violin Concertos</div>
+                    <div class="album-date">(1987) · 1 FLAC</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[362689] = [{"torrentId": 807162, "media": "CD", "encoding": "Lossless", "remasterYear": 1987, "remasterTitle": "Remastered", "fileCount": 17, "size": 350754607, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=807162&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                <div class="album" onclick="showTorrents(1557058, 'Steve Roach', 'Sentient Being', 2026, 2)" id="album-1557058">
+                    <button class="delete-btn" onclick="deleteAlbum(1557058, event)" title="Eliminar álbum">×</button>
+                    <img src="https://i.postimg.cc/tCV6cNXV/cover.jpg" alt="Steve Roach - Sentient Being">
+                    <div class="album-artist">Steve Roach</div>
+                    <div class="album-name">Sentient Being</div>
+                    <div class="album-date">(2026) · 2 FLACs</div>
+                </div>
+            
+                <script>
+                    if (!window.torrentData) window.torrentData = {};
+                    window.torrentData[1557058] = [{"torrentId": 3509566, "media": "WEB", "encoding": "24bit Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 8, "size": 1277667721, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3509566&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}, {"torrentId": 3509569, "media": "WEB", "encoding": "Lossless", "remasterYear": 2026, "remasterTitle": "", "fileCount": 8, "size": 498985908, "downloadUrl": "https://orpheus.network/torrents.php?action=download&id=3509569&authkey=dHqywK-qVm1ewbhzF4CT2M6OLfCg9eFL&torrent_pass=4d47d8973df127cb1734c551f91753bc&usetoken=1"}];
+                </script>
+            
+                </div>
+            </div>
+            <div class="sidebar" id="sidebar">
+                <div class="sidebar-placeholder">
+                    Selecciona un álbum para ver los torrents disponibles
+                </div>
+            </div>
+        </div>
+
+        <div id="notification" class="notification"></div>
+
+        <script>
+            let currentSelected = null;
+
+            function showNotification(message, isError = false) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = 'notification show' + (isError ? ' error' : '');
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+
+            function showTorrents(groupId, artist, albumName, year, flacCount) {
+                // Actualizar selección visual
+                if (currentSelected) {
+                    document.getElementById('album-' + currentSelected).classList.remove('selected');
+                }
+                document.getElementById('album-' + groupId).classList.add('selected');
+                currentSelected = groupId;
+
+                const torrents = window.torrentData[groupId];
+                const sidebar = document.getElementById('sidebar');
+
+                let tableHtml = `
+                    <div class="album-header">
+                        <h3>${artist}</h3>
+                        <p>${albumName} (${year})</p>
+                        <p>${flacCount} torrent${flacCount > 1 ? 's' : ''} FLAC disponible${flacCount > 1 ? 's' : ''}</p>
+                    </div>
+                    <table class="flac-table">
+                        <thead>
+                            <tr>
+                                <th>Media</th>
+                                <th>Año</th>
+                                <th>Remaster</th>
+                                <th>#N</th>
+                                <th>MB</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                torrents.forEach((torrent, index) => {
+                    const media = torrent.media || 'N/A';
+                    const remasterYear = torrent.remasterYear || year;
+                    const remasterTitle = torrent.remasterTitle || 'Original';
+                    const fileCount = torrent.fileCount || 0;
+                    const sizeMB = (torrent.size / (1024 * 1024)).toFixed(2);
+                    const downloadUrl = torrent.downloadUrl || '#';
+                    const torrentId = torrent.id || index;
+
+                    tableHtml += `
+                        <tr>
+                            <td>${media}</td>
+                            <td>${remasterYear}</td>
+                            <td>${remasterTitle}</td>
+                            <td>${fileCount}</td>
+                            <td>${sizeMB}</td>
+                            <td>
+                                <button class="download-btn" onclick="downloadTorrent('${downloadUrl}', ${groupId}, '${torrentId}')" id="download-${torrentId}">
+                                    Descargar
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tableHtml += `
+                        </tbody>
+                    </table>
+                `;
+
+                sidebar.innerHTML = tableHtml;
+            }
+
+            async function downloadTorrent(downloadUrl, groupId, torrentId) {
+                const btn = document.getElementById('download-' + torrentId);
+                const originalText = btn.textContent;
+
+                btn.disabled = true;
+                btn.innerHTML = 'Descargando <span class="loader"></span>';
+
+                try {
+                    const response = await fetch('/api/download', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            downloadUrl: downloadUrl,
+                            groupId: groupId,
+                            torrentId: torrentId
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showNotification('✓ Descarga completada. Recargando página...');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        showNotification('✗ Error: ' + (data.error || 'Error desconocido'), true);
+                        btn.disabled = false;
+                        btn.textContent = originalText;
+                    }
+                } catch (error) {
+                    showNotification('✗ Error de conexión: ' + error.message, true);
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            }
+
+            async function deleteAlbum(groupId, event) {
+                event.stopPropagation();
+
+                if (!confirm('¿Estás seguro de que quieres eliminar este álbum?')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/delete', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            groupId: groupId
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showNotification('✓ Álbum eliminado. Recargando página...');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        showNotification('✗ Error: ' + (data.error || 'Error desconocido'), true);
+                    }
+                } catch (error) {
+                    showNotification('✗ Error de conexión: ' + error.message, true);
+                }
+            }
+        </script>
+    </body>
+    </html>
+    
